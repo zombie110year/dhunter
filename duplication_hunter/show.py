@@ -1,9 +1,12 @@
-from .database import FILEINFO
-import colorama as c
 import platform as p
+
+import colorama as c
+
+from .database import FILEINFO
 
 if p.platform() == "Windows":
     c.init()
+
 
 def showStatus():
     _total = FILEINFO.item_count()

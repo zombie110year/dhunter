@@ -1,10 +1,10 @@
+import re
 from argparse import ArgumentParser
 
 from .compare import compareFile
+from .database import dumpDB
 from .search import FileSearcher
 from .show import showStatus
-from .database import dumpDB
-import re
 
 
 def simpleHandle(path, ignore):

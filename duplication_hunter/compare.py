@@ -1,5 +1,6 @@
 from hashlib import md5
 from pathlib import Path
+
 from .database import CAUGHT_FILES, FILEINFO
 
 

@@ -6,9 +6,9 @@ r"""包装数据库:
 
 import pickle
 import sys
+from collections import namedtuple
 from pathlib import Path
 from queue import Queue
-from collections import namedtuple
 
 from .setting import FILEINFO_DB_PATH
 
@@ -18,9 +18,11 @@ FileItem = namedtuple(
         "mtime",    # 最近修改时间
     ])
 
+
 class MemoryDict:
     """存储 hash-path 对
     """
+
     def __init__(self, db_path):
         self._datum = dict()
         self._db_path = db_path
@@ -143,6 +145,7 @@ def installed(cmd):
 
 FILEINFO = SimpleDatabaseFactory(FILEINFO_DB_PATH)
 CAUGHT_FILES = Queue()
+
 
 def dumpDB():
     """本次运行结束后调用
