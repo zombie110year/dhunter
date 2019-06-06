@@ -8,7 +8,7 @@ if p.platform() == "Windows":
     c.init()
 
 
-def showStatus():
+def simpleShow():
     _total = FILEINFO.item_count()
     print("---")
     print(f"total: {_total}")

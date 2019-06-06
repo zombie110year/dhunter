@@ -39,3 +39,8 @@ def _FileSearch(root: Path, chan, ignore):
                 chan.put(i.absolute())
         elif i.is_dir():
             _FileSearch(i, chan, ignore)
+
+
+def simpleScan(path, ignore):
+    searcher = FileSearcher(path, ignore)
+    searcher()
