@@ -14,5 +14,5 @@ setup(
             "dhunt = duplication_hunter.run:main"
         ]
     },
-    require=["colorama"],
+    require=["colorama", "sqlite3"],
 )
