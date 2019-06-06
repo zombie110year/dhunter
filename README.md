@@ -12,10 +12,10 @@
 
 ```sh
 # 搜索当前目录
-dhunter
+dhunt
 
 # 搜索 D:/xiaoshipin 目录
-dhunter D:/xiaoshipin
+dhunt D:/xiaoshipin
 ```
 
 ## `--ignore`
@@ -25,7 +25,7 @@ dhunter D:/xiaoshipin
 示例:
 
 ```python
-o.name !=
+o.name != '.fileinfo.db'
 ```
 
 <!-- ## `--fuzzy`
