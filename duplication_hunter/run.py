@@ -1,4 +1,3 @@
-import re
 from argparse import ArgumentParser
 
 from .compare import compareFile
@@ -12,8 +11,8 @@ def simpleHandle(path, ignore):
     searcher = FileSearcher(path, ignore)
     searcher()
     compareFile()
-    dumpDB()
     showStatus()
+    dumpDB()
 
 
 def getParser():

@@ -36,6 +36,6 @@ def _FileSearch(root: Path, chan, ignore):
         if i.is_file():
             if not ignore(i):
                 # 输出
-                chan.put(i)
+                chan.put(i.absolute())
         elif i.is_dir():
             _FileSearch(i, chan, ignore)

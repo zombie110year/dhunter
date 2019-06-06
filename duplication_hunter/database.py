@@ -25,9 +25,9 @@ class MemoryDict:
 
     def __init__(self, db_path):
         self._datum = dict()
+        self._index = dict()    # 以 path-mtime 为键值对的索引
         self._db_path = db_path
         self._load()
-        self._index = dict()    # 以 path-mtime 为键值对的索引
 
     def put(self, key, value):
         """保存一个条目
@@ -63,7 +63,7 @@ class MemoryDict:
         :param str path: 文件的绝对路径
         """
 
-        if path in self._index and self._index[path].mtime >= Path(path).stat().st_mtime:
+        if path in self._index and self._index[path] >= Path(path).stat().st_mtime:
             return False
         else:
             return True
@@ -83,7 +83,7 @@ class MemoryDict:
         _db_path = Path(self._db_path)
         if _db_path.exists():
             _db = _db_path.open("rb")
-            self._datum = pickle.load(_db)
+            self._datum, self._index = pickle.load(_db)
             _db.close()
 
     def _dump(self):
@@ -99,7 +99,7 @@ class MemoryDict:
                 return
 
         _db = _db_path.open("wb")
-        pickle.dump(self._datum, _db)
+        pickle.dump((self._datum, self._index), _db)
         _db.close()
 
 
