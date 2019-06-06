@@ -63,11 +63,8 @@ class MemoryDict:
         :param str path: 文件的绝对路径
         """
 
-        if path in self._index:
-            if self._index[path].mtime < Path(path).stat().st_mtime:
-                return True
-            else:
-                return False
+        if path in self._index and self._index[path].mtime >= Path(path).stat().st_mtime:
+            return False
         else:
             return True
 
