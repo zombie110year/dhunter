@@ -21,16 +21,6 @@ dhunt scan
 dhunt scan D:/xiaoshipin
 ```
 
-## scan 参数: `--ignore`
-
-可选参数, 指定文件排除规则, 使用 Python 的 lambda 表达式, 如果文件对象满足此条件, 则不被包含在重复列表中, 传入的参数是名为 `o` 的 `pathlib.Path` 对象. 支持使用正则模块(re).
-
-示例:
-
-```python
-o.name != '.fileinfo.db'
-```
-
 <!-- ## `--fuzzy`
 
 启用模糊搜索, 将判据 "相同" 更改为 "相似".

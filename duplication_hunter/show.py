@@ -1,4 +1,5 @@
 import platform as p
+from pathlib import Path
 
 import colorama as c
 
@@ -20,5 +21,4 @@ def simpleShow():
         print(c.Fore.GREEN, f"{_count} ++++ ", paths[0], c.Style.RESET_ALL)
         for path in paths[1:]:
             print(c.Fore.RED, "| ", path, c.Style.RESET_ALL)
-
         print()
