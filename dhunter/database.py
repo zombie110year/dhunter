@@ -15,69 +15,88 @@ from .setting import FILEINFO_DB_PATH
 FileItem = namedtuple(
     "FileItem", [
         "path",     # 绝对路径
+        "hash",      # Hash 值
         "mtime",    # 最近修改时间
     ])
 
 
 class MemoryDict:
-    """存储 hash-path 对
+    """存储 path, md5, mtime 元组, 以 path 为键:
+
+    .. code::
+        :caption: self._datum
+
+        {
+            path: FileItem(path: str, hash: str, mtime: float)
+        }
     """
 
     def __init__(self, db_path):
-        self._datum = dict()
-        self._index = dict()    # 以 path-mtime 为键值对的索引
+        self._datum = dict()    # 以 path-FileItem 为键值对的数据库
+        self._index = dict()    # 以 hash-{path, } 为键值对的索引
         self._db_path = db_path
         self._load()
 
-    def put(self, key, value):
-        """保存一个条目
+    def select(self, path: str) -> float:
+        """从数据库或索引中以绝对路径为键查询一个值
+        如果存在, 则返回对应的 mtime, 否则, 返回 None
+        """
+        _item = self._datum.get(path, None)
+        if not _item is None:
+            return _item.mtime
+        else:
+            return None
+
+    def insert(self, path: str, hash: str, mtime: float):
+        """新增一个条目
 
         :param str key: hash 值的 字符串表示
         :param str value: 文件的绝对路径
+        :param float mtime: 文件的最后修改时间
         """
-        if key not in self._datum:
-            self._datum[key] = set()
+        # 保存数据
+        _item = FileItem(path, hash, mtime)
+        self._datum[path] = _item
 
-        # 构建条目: 路径, 最近修改时间
-        _path = Path(value)
-        _mtime = _path.stat().st_mtime
-        _path_str = str(_path.absolute())
-        _item = FileItem(_path_str, _mtime)
+        # 更新索引
+        if hash not in self._index:
+            self._index[hash] = set()
+        self._index[hash].add(path)
 
-        self._index[_path_str] = _mtime
-        self._datum[key].add(_item)
+    def update(self, path: str, hash: str, mtime: float):
+        """更新一个条目, 有可能在索引中移动此条目
 
-    def get(self, key):
-        "获取具有相同 hash 值的 FileItem 集合"
-        return list(map(lambda x: x.path, self._datum[key]))
-
-    def keys(self):
-        "获取所有的 Hash 值"
-        for key in self._datum:
-            if len(self._datum[key]) > 1:
-                yield key
-
-    def is_new(self, path):
-        """检查 path 条目的 mtime. 若当前读取的文件较新则更新
-
-        :param str path: 文件的绝对路径
+        :param str key: hash 值的 字符串表示
+        :param str value: 文件的绝对路径
+        :param float mtime: 文件的最后修改时间
         """
+        # 查找旧记录
+        _old_item = self._datum[path]
+        # 插入新记录
+        _item = FileItem(path, hash, mtime)
+        self._datum[path] = _item
+        # 更新索引
+        self._index[_old_item.hash].remove(_old_item.path)
+        self._index[hash].add(path)
 
-        if path in self._index and self._index[path] >= Path(path).stat().st_mtime:
-            return False
-        else:
-            return True
+    def query(self, hash):
+        """获取具有相同 hash 值的 FileItem 集合,
+        按照 mtime 的顺序排序
+        """
+        _item_list = list(self._index[hash])
+        _item_list.sort(key=lambda x: x.mtime)
+        return _item_list
 
     def item_count(self):
-        """条目群组的数量, 多个重复条目归为一个群组
+        """重复条目的数量
         """
-        count = 0
-        for key in self._datum:
-            item = self._datum[key]
-            if len(item) > 1:
-                count += 1
+        _item_count = 0
 
-        return count
+        for _set in self._index:
+            if len(_set) >= 2:
+                _item_count += 1
+
+        return _item_count
 
     def _load(self):
         _db_path = Path(self._db_path)
