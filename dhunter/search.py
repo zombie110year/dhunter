@@ -1,3 +1,5 @@
+"""搜索文件系统中的文件
+"""
 from pathlib import Path
 
 from .database import CAUGHT_FILES
@@ -30,7 +32,7 @@ def _FileSearch(root: Path, chan):
 
     for i in root.iterdir():
         if i.is_file():
-            chan.put(i.absolute())
+            chan.put(str(i.absolute()))
         elif i.is_dir():
             _FileSearch(i, chan)
 

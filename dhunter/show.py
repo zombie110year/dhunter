@@ -10,14 +10,15 @@ if p.platform() == "Windows":
 
 
 def simpleShow():
-    _total = FILEINFO.item_count()
+    _hashs = FILEINFO.duped_hashs()
+    _total = len(_hashs)
     print("---")
     print(f"total: {_total}")
     print("---")
     _count = 0
-    for key in FILEINFO.keys():
+    for hash in _hashs:
         _count += 1
-        paths = FILEINFO.get(key)
+        paths = FILEINFO.query(hash)
         print(c.Fore.GREEN, f"{_count} ++++ ", paths[0], c.Style.RESET_ALL)
         for path in paths[1:]:
             print(c.Fore.RED, "| ", path, c.Style.RESET_ALL)

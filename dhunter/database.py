@@ -1,7 +1,9 @@
 r"""包装数据库:
 
 1. 如果本机已安装 SQLite3, 则使用它
-2. 如果未安装 SQLite3, 则使用 Python 字典与
+2. 如果未安装 SQLite3, 则使用 Python 字典
+
+在任何数据存储对象中, 存储都是 Python 原生对象
 """
 
 import pickle
@@ -84,21 +86,30 @@ class MemoryDict:
         按照 mtime 的顺序排序
         """
         _item_list = list(self._index[hash])
-        _item_list.sort(key=lambda x: x.mtime)
+        _item_list.sort(key=lambda x: self._datum[x].mtime)
         return _item_list
 
-    def item_count(self):
-        """重复条目的数量
+    def hashs(self):
+        """获取数据库中已存储的所有 hash 值
         """
-        _item_count = 0
 
-        for _set in self._index:
-            if len(_set) >= 2:
-                _item_count += 1
+        return self._index.keys()
 
-        return _item_count
+    def duped_hashs(self):
+        """获取数据库中重复条目的 hash 值
+        """
+
+        result = []
+        for hash in self._index.keys():
+            if len(self._index[hash]) >= 2:
+                result.append(hash)
+
+        return result
 
     def _load(self):
+        """从 cwd 中读取 .fileinfo.db 内容
+        将其设为 self._datum 和 self._index
+        """
         _db_path = Path(self._db_path)
         if _db_path.exists():
             _db = _db_path.open("rb")

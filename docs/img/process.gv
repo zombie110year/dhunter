@@ -1,0 +1,23 @@
+digraph scan {
+    node[shape="rect"];
+    label="搜索目标目录下的文件";
+
+    O_start[label="建立新的临时表", color="#00ff0d"];
+    R_start[label="读取文件队列"];
+    A[label="检索 cwd 下的缓存数据库中是否存在同名文件"];
+    B1[label="新建条目"];
+    B2[label="在缓存数据库中对比文件 mtime"];
+    C1[label="计算目标文件的 md5 值"];
+    D1[label="更新缓存数据库"];
+    O_end[label="用临时表替代原表", color="#ce0000"];
+
+    O_start     ->  R_start;
+    R_start     ->  A;
+    A           ->  B1[label="没有"];
+    A           ->  B2[label="有"];
+    B2          ->  C1[label="更新"];
+    B2          ->  R_start[label="不变"];
+    C1          ->  D1;
+    {D1 B1}     ->  R_start;
+    R_start     ->  O_end[label="循环结束"];
+}
