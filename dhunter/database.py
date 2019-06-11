@@ -22,6 +22,10 @@ FileItem = namedtuple(
     ])
 
 
+class VersionError(Exception):
+    # 数据库中的文件格式不同, 导致当前版本无法解析
+    pass
+
 class MemoryDict:
     """存储 path, md5, mtime 元组, 以 path 为键:
 
@@ -32,6 +36,8 @@ class MemoryDict:
             path: FileItem(path: str, hash: str, mtime: float)
         }
     """
+
+    DB_VERSION = 1
 
     def __init__(self, db_path):
         self._old_datum = dict()    # 旧的数据库, 从 .fileinfo.db 中读取而来
@@ -109,18 +115,28 @@ class MemoryDict:
         _db_path = Path(self._db_path)
         if _db_path.exists():
             _db = _db_path.open("rb")
-            self._old_datum, self._old_index = pickle.load(_db)
+            _wrap = pickle.load(_db)
+            if _wrap["version"] == self.DB_VERSION:
+                self._old_datum, self._old_index = _wrap["datum"], _wrap["index"]
+            else:
+                raise VersionError("database dump file version error, delete .fileinfo.db and scan again\n"
+                    f"current: {self.DB_VERSION}, dumped: {_wrap['version']}")
             _db.close()
 
     def _dump(self):
         """保存本次 scan 的结果
         """
+        _wrap = {}
+        _wrap["version"] = self.DB_VERSION
+        _wrap["datum"] = self._datum
+        _wrap["index"] = self._index
+
         _db_path = Path(self._db_path)
         if not _db_path.exists():
             _db_path.touch()
 
         _db = _db_path.open("wb")
-        pickle.dump((self._datum, self._index), _db)
+        pickle.dump(_wrap, _db)
         _db.close()
 
 
