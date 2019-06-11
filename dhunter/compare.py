@@ -30,8 +30,5 @@ def compareFile():
             _hash = _hash.hexdigest()
             FILEINFO.insert(path, _hash, _mtime)
         else:
-            # 现存文件不需要更新, 直接复制前面的记录即可
-            _hash = md5()
-            _hash.update(_file_obj.read_bytes())
-            _hash = _hash.hexdigest()
+            # 文件记录不需要更新, 直接复制旧记录即可
             FILEINFO.update(path)
