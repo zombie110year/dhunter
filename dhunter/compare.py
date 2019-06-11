@@ -4,10 +4,8 @@
 """
 from hashlib import md5
 from pathlib import Path
-import sys
 
 from .database import CAUGHT_FILES, FILEINFO
-
 
 
 def compareFile():
@@ -18,7 +16,7 @@ def compareFile():
     """
     while not CAUGHT_FILES.empty():
         path = CAUGHT_FILES.get()
-        _file_obj   = Path(path)
+        _file_obj = Path(path)
         _mtime = _file_obj.stat().st_mtime
 
         _stored_mtime = FILEINFO.select(path)

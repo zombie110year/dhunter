@@ -1,15 +1,14 @@
 import platform as p
-from pathlib import Path
 
 import colorama as c
 
 from .database import FILEINFO
 
-if p.platform() == "Windows":
-    c.init()
-
 
 def simpleShow():
+    if p.platform() == "Windows":
+        c.init()
+
     _hashs = FILEINFO.duped_hashs()
     _total = len(_hashs)
     print("---")

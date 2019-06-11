@@ -7,7 +7,6 @@ r"""包装数据库:
 """
 
 import pickle
-import sys
 from collections import namedtuple
 from pathlib import Path
 from queue import Queue
@@ -25,6 +24,7 @@ FileItem = namedtuple(
 class VersionError(Exception):
     # 数据库中的文件格式不同, 导致当前版本无法解析
     pass
+
 
 class MemoryDict:
     """存储 path, md5, mtime 元组, 以 path 为键:
@@ -52,7 +52,7 @@ class MemoryDict:
         如果存在, 则返回对应的 mtime, 否则, 返回 None
         """
         _item = self._old_datum.get(path, None)
-        if not _item is None:
+        if _item is not None:
             return _item.mtime
         else:
             return None
@@ -120,7 +120,7 @@ class MemoryDict:
                 self._old_datum, self._old_index = _wrap["datum"], _wrap["index"]
             else:
                 raise VersionError("database dump file version error, delete .fileinfo.db and scan again\n"
-                    f"current: {self.DB_VERSION}, dumped: {_wrap['version']}")
+                                   f"current: {self.DB_VERSION}, dumped: {_wrap['version']}")
             _db.close()
 
     def _dump(self):
@@ -140,44 +140,7 @@ class MemoryDict:
         _db.close()
 
 
-class SQLiteDB:
-    def __init__(self, path):
-        pass
-
-    def _init_db(self):
-        pass
-
-    def put(self, key, value):
-        pass
-
-    def get(self, key):
-        pass
-
-    def keys(self):
-        pass
-
-    def _load(self, path):
-        pass
-
-    def _dump(self, path):
-        pass
-
-
-class SimpleDatabaseFactory(type):
-    def __new__(self, path):
-        if installed("sqlite3"):
-            type_ = SQLiteDB
-        else:
-            type_ = MemoryDict
-
-        return type_(path)
-
-
-def installed(cmd):
-    return False
-
-
-FILEINFO = SimpleDatabaseFactory(FILEINFO_DB_PATH)
+FILEINFO = MemoryDict(FILEINFO_DB_PATH)
 CAUGHT_FILES = Queue()
 
 
