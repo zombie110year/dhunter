@@ -1,3 +1,3 @@
-from duplication_hunter.run import main
+from dhunter.run import main
 
 main()
